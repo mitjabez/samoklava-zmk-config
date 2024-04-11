@@ -21,11 +21,9 @@
 
 #define DEFAULT 0
 #define LOWER   1
-#define RAISE   2
-#define ADJUST  3
+#define SYMBOL  2
 #define LWR LOWER
-#define RSE RAISE
-#define ADJ ADJUST
+#define SYM SYMBOL
 
 &mt {
     quick-tap-ms = <180>;
@@ -114,62 +112,72 @@
             };
         };
 
-        combos {
-           compatible = "zmk,combos";
-           combo_lpar {
-              timeout-ms = <50>;
-              key-positions = <25 26>;
-              bindings = <&kp LPAR>;
-           };
-
-           combo_rpar {
-              timeout-ms = <50>;
-              key-positions = <33 34>;
-              bindings = <&kp RPAR>;
-           };
-        };
-
-        conditional_layers {
-            compatible = "zmk,conditional-layers";
-            tri_layer {
-                if-layers = <LOWER RAISE>;
-                then-layer = <ADJUST>;
+        macros {
+            // Slovenian chars
+            slo_upper_ch: slo_upper_ch {
+                label = "slo_upper_ch";
+                compatible = "zmk,behavior-macro";
+                #binding-cells = <0>;
+                bindings
+                    = <&macro_press &kp RIGHT_ALT>
+                    , <&macro_press &kp RIGHT_SHIFT>
+                    , <&macro_tap &kp SEMICOLON>
+                    , <&macro_release &kp RIGHT_SHIFT>
+                    , <&macro_release &kp RIGHT_ALT>
+                    ;
+            };
+            slo_upper_zh: slo_upper_zh {
+                label = "slo_upper_zh";
+                compatible = "zmk,behavior-macro";
+                #binding-cells = <0>;
+                bindings
+                    = <&macro_press &kp RIGHT_ALT>
+                    , <&macro_press &kp RIGHT_SHIFT>
+                    , <&macro_tap &kp BACKSLASH>
+                    , <&macro_release &kp RIGHT_SHIFT>
+                    , <&macro_release &kp RIGHT_ALT>
+                    ;
+            };
+            slo_upper_sh: slo_upper_sh {
+                label = "slo_upper_sh";
+                compatible = "zmk,behavior-macro";
+                #binding-cells = <0>;
+                bindings
+                    = <&macro_press &kp RIGHT_ALT>
+                    , <&macro_press &kp RIGHT_SHIFT>
+                    , <&macro_tap &kp LBKT>
+                    , <&macro_release &kp RIGHT_SHIFT>
+                    , <&macro_release &kp RIGHT_ALT>
+                    ;
             };
         };
+
 
         keymap {
                 compatible = "zmk,keymap";
 
                 default_layer {
                         bindings = <
-   &none &kp Q        &kp W         &kp E        &kp R         &kp T             &kp Y         &kp U            &kp I           &kp O            &kp P          &none
-   &none &hml LCMD A  &hml RALT S   &hml LCTRL D &hsl LSHFT F  &kp G             &kp H         &hsr RSHFT J     &hmr RCTRL K    &hmr RALT L      &hmr RCMD SEMI &none
-   &none &kp Z        &hml LALT X   &kp C        &kp V         &kp B             &kp N         &kp M            &kp COMMA       &hmr LALT DOT    &kp FSLH       &none
-                                    &lt RSE ESC  &lt LWR QUOT  &kp SPACE         &mt RSHFT RET &lt RSE BSPC     &lt LWR TAB
+   &none &kp Q        &kp W         &kp E          &kp R         &kp T             &kp Y         &kp U            &kp I           &kp O            &kp P          &none
+   &none &hml LCMD A  &hml LALT S   &hml LCTRL D   &hsl LSHFT F  &kp G             &kp H         &hsr RSHFT J     &hmr RCTRL K    &hmr RALT L      &hmr RCMD SEMI &none
+   &none &kp Z        &kp X         &kp C          &kp V         &kp B             &kp N         &kp M            &kp COMMA       &kp  DOT         &kp FSLH       &none
+                                    &kp ESC        &lt SYM SPACE &lt LWR TAB       &lt LWR DEL   &lt SYM BSPC     &kp RET
                         >;
                 };
                 lower_layer {
                         bindings = <
-   &none &kp N1       &kp N2       &kp N3        &kp N4        &kp N5            &kp N6        &kp N7           &kp N8           &kp N9          &kp N0         &none
-   &none &kp LCMD     &kp RALT     &kp LCTRL     &kp LSHFT     &none             &kp LEFT      &hsr RSHFT DOWN  &hmr RCTRL UP    &hmr RALT RIGHT &kp RCMD       &none
-   &none &none        &kp LALT     &none         &kp Y         &none             &kp HOME      &kp PG_DN        &kp PG_UP        &hmr LALT END   &caps_word     &none
-                                   &lt RSE ESC   &lt LWR QUOT  &kp SPACE         &mt RSHFT RET &mo RSE          &lt LWR TAB
+   &none &kp N1        &kp N2        &kp N3        &kp N4        &kp N5            &kp N6        &kp N7           &kp N8           &kp N9          &kp N0         &none
+   &none &slo_upper_zh &slo_upper_sh &slo_upper_ch &kp LSHFT     &none             &kp LEFT      &hsr RSHFT DOWN  &kp UP           &kp RIGHT       &kp COMMA      &none
+   &none &kp RA(BSLH)  &kp RA(LBKT)  &kp RA(SEMI)  &none         &caps_word        &kp HOME      &kp PG_DN        &kp PG_UP        &kp END         &kp DOT        &none
+                                     &kp ESC       &kp SPACE     &kp TAB           &kp DEL       &kp BSPC         &kp RET
                         >;
                 };
-                raise_layer {
+                symbol_layer {
                         bindings = <
-   &none &kp EXCL     &kp AT       &kp HASH      &kp DLLR      &kp PRCNT         &kp CARET     &kp AMPS         &kp KP_MULTIPLY  &kp LPAR        &kp RPAR       &none
-   &none &hml LCMD F1 &hml RALT F2 &hml LCTRL F3 &hsl LSHFT F4 &kp F5            &kp MINUS     &hsr RSHFT EQUAL &hmr RCTRL LBKT  &hmr RALT RBKT  &hmr RCMD BSLH &none
-   &none &kp F6       &hml LALT F7 &kp F8        &kp F9        &kp F10           &kp UNDER     &kp PLUS         &kp LBRC         &kp RBRC        &kp PIPE       &none
-                                   &lt RSE ESC   &mo LWR       &kp GRAVE         &mt RSHFT RET &lt RSE BSPC     &lt LWR TAB
-                        >;
-                };
-                adjust_layer {
-                        bindings = <
-   &none &bt BT_CLR   &none        &none         &none         &none             &none         &kp K_MUTE       &none            &none           &bootloader   &none
-   &none &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4      &kp C_BRI_UP  &kp C_VOL_UP     &none            &none           &none         &none
-   &none &sys_reset   &none        &none         &none         &none             &kp C_BRI_DN  &kp C_VOL_DN     &none            &none           &sys_reset    &none
-                                   &none         &none         &none             &none         &none            &none
+   &none &kp LS(N1)    &kp LS(N2)    &kp LS(N3)    &kp LS(N4)    &kp LS(N5)        &kp LS(N6)    &kp LS(N7)       &kp LS(N8)       &kp LS(N9)      &kp LS(N0)     &none
+   &none &none         &none         &kp GRAVE     &none         &kp EQUAL         &kp MINUS     &kp SQT          &kp LBKT         &kp RBKT        &kp BSLH       &none
+   &none &none         &none         &kp LS(GRAVE) &none         &kp LS(EQUAL)     &kp LS(MINUS) &kp LS(SQT)      &kp LS(LBKT)     &kp LS(RBKT)    &kp LS(BSLH)   &none
+                                     &kp ESC       &kp SPACE     &kp TAB           &kp DEL       &kp BSPC         &kp RET
                         >;
                 };
         };
