@@ -5,6 +5,8 @@ MY_NAME=$(basename "$0")
 
 MNT_DIR="/mnt/usb"
 KEYB_ID=" Adafruit_nRF_UF2"
+ZIP_FILE=
+SIDE="both"
 TMP_DIR=
 
 error() {
@@ -17,14 +19,17 @@ die() {
 }
 
 usage() {
-  echo "$MY_NAME <firmware zip file>"
-  echo "Flashes the ZMK firmware to the keyboard."
-}
+  cat <<EOF
+$MY_NAME <firmware zip file>
+Flashes the ZMK firmware to the keyboard.
 
-if [ $# -ne 1 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-  usage
-  exit 1
-fi
+Arguments:
+  -s, --side <side>         Which side of the keyboard to flash. Can be left, right, both. (Default: $SIDE).
+  -f, --file <file>         Zip file to flash. The zip file contains uf2 files for both sides of the keyboard.
+  -h, --help                Display this help message.
+
+EOF
+}
 
 cleanup() {
   [ -n "$TMP_DIR" ] && rm -rf "$TMP_DIR"
@@ -84,16 +89,39 @@ flash() {
   echo
 }
 
-zip_file="$1"
-test -f "$zip_file" || die "File $zip_file doesn't exist"
+parse_args() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      -s|--side) SIDE="$2"; shift 2 ;;
+      -f|--file) ZIP_FILE="$2"; shift 2 ;;
+      -h|--help) usage; exit 0; ;;
+      *) echo "Unknown parameter: $1"; usage; exit 1; ;;
+    esac
+  done
+}
 
-trap cleanup EXIT
-TMP_DIR=$(mktemp -d)
-unzip "$zip_file" -d "$TMP_DIR"
+main() {
+  parse_args "$@"
 
-cd "$TMP_DIR"
-ls "$TMP_DIR"
-flash "left"
-flash "right"
+  test -z "$ZIP_FILE" && die "Please provide the zip file. Check -h for more info."
+  test -f "$ZIP_FILE" || die "File $ZIP_FILE doesn't exist"
+  if [[ "$SIDE" != "left" ]] && [[ "$SIDE" != "right" ]] && [[ "$SIDE" != "both" ]]; then
+    die "Invalid side. Can be left, right, both."
+  fi
 
+  trap cleanup EXIT
+  TMP_DIR=$(mktemp -d)
+  unzip "$ZIP_FILE" -d "$TMP_DIR"
 
+  cd "$TMP_DIR"
+  ls "$TMP_DIR"
+
+  if [ "$SIDE" == "left" ] || [ "$SIDE" == "both" ]; then
+    flash "left"
+  fi
+  if [ "$SIDE" == "right" ] || [ "$SIDE" == "both" ]; then
+    flash "right"
+  fi
+}
+
+main "$@"

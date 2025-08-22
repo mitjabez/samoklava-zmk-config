@@ -10,9 +10,8 @@ microcontroller.
 - Flash using the flash utility.
 
   ```bash
-  sudo  ./scripts/flash-samoklava.sh
+  sudo  ./scripts/flash-samoklava.sh -f firmware.zip
   ```
 
-  > ℹ️  To put the keyboard into flash mode double press the reset button. When flashing the right keyboard connect it
-  using USB! Connection via TRRS cable is not enough.
-
+  > ℹ️ To put the keyboard into flash mode double press the reset button while the keyboard is **OFF but connected via
+  > cable**. When flashing the right keyboard connect it using USB! Connection via TRRS cable is not enough.
